@@ -1,7 +1,13 @@
 {
     "name": "blackcube/yii-oauth2",
     "description": "PHP 8.3+ OAuth2/JWT toolbox for Yii3 framework with multi-population support",
-    "keywords": ["yii3", "oauth2", "jwt", "authentication", "multi-tenant"],
+    "keywords": [
+        "yii3",
+        "oauth2",
+        "jwt",
+        "authentication",
+        "multi-tenant"
+    ],
     "type": "library",
     "license": "BSD-3-Clause",
     "homepage": "https://github.com/blackcubeio/yii-oauth2",
@@ -22,7 +28,7 @@
         "bshaffer/oauth2-server-php": "^v1.14",
         "lcobucci/jwt": "^5.6",
         "yiisoft/yii-http": "^1.1",
-        "psr/http-message": "^1.0 || ^2.0",
+        "psr/http-message": "^2.0",
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
         "psr/clock": "^1.0"
@@ -31,7 +37,7 @@
         "codeception/codeception": "^5.3",
         "codeception/module-asserts": "^3.3",
         "codeception/module-db": "^3.2",
-        "vlucas/phpdotenv": "^v5.6",
+        "vlucas/phpdotenv": "^5.6",
         "yiisoft/active-record": "^1.0",
         "yiisoft/db": "^2.0",
         "yiisoft/db-migration": "^2.0",
