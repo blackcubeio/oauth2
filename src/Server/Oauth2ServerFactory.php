@@ -26,7 +26,8 @@ final class Oauth2ServerFactory
 {
     public static function create(
         Oauth2Storage $storage,
-        PopulationConfig $config
+        PopulationConfig $config,
+        array $customGrants = []
     ): Server {
         $server = new Server($storage, [
             'access_lifetime' => $config->getAccessTokenTtl(),
@@ -57,6 +58,10 @@ final class Oauth2ServerFactory
                 'always_issue_new_refresh_token' => true,
                 'unset_refresh_token_after_use' => true,
             ]));
+        }
+
+        foreach ($customGrants as $grant) {
+            $server->addGrantType($grant);
         }
 
         return $server;
