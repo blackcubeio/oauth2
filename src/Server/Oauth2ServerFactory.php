@@ -7,9 +7,9 @@ declare(strict_types=1);
  *
  * PHP Version 8.3+
  *
- * @copyright 2010-2026 Philippe Gaultier
- * @license https://www.blackcube.io/license
- * @link https://www.blackcube.io
+ * @author Philippe Gaultier <pgaultier@blackcube.io>
+ * @copyright 2010-2026 Blackcube
+ * @license https://blackcube.io/license
  */
 
 namespace Blackcube\Oauth2\Server;
@@ -26,7 +26,8 @@ final class Oauth2ServerFactory
 {
     public static function create(
         Oauth2Storage $storage,
-        PopulationConfig $config
+        PopulationConfig $config,
+        array $customGrants = []
     ): Server {
         $server = new Server($storage, [
             'access_lifetime' => $config->getAccessTokenTtl(),
@@ -57,6 +58,10 @@ final class Oauth2ServerFactory
                 'always_issue_new_refresh_token' => true,
                 'unset_refresh_token_after_use' => true,
             ]));
+        }
+
+        foreach ($customGrants as $grant) {
+            $server->addGrantType($grant);
         }
 
         return $server;

@@ -7,9 +7,9 @@ declare(strict_types=1);
  *
  * PHP Version 8.3+
  *
- * @copyright 2010-2026 Philippe Gaultier
- * @license https://www.blackcube.io/license
- * @link https://www.blackcube.io
+ * @author Philippe Gaultier <pgaultier@blackcube.io>
+ * @copyright 2010-2026 Blackcube
+ * @license https://blackcube.io/license
  */
 
 namespace Blackcube\Oauth2\Storage;
