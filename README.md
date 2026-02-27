@@ -1,20 +1,15 @@
-# Blackcube Yii3 OAuth2
+# Blackcube OAuth2
 
-PHP 8.3+ OAuth2/JWT toolbox for Yii3 framework with multi-population support based on BShaffer oauth2 server.
+OAuth2/JWT toolbox with multi-population support based on BShaffer oauth2 server.
 
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE.md)
-[![PHP Version](https://img.shields.io/badge/php-8.3%2B-blue.svg)](https://php.net)
-[![Packagist Version](https://img.shields.io/packagist/v/blackcube/yii-oauth2.svg)](https://packagist.org/packages/blackcube/yii-oauth2)
+[![Packagist Version](https://img.shields.io/packagist/v/blackcube/oauth2.svg)](https://packagist.org/packages/blackcube/oauth2)
 
 ## Installation
 
 ```bash
-composer require blackcube/yii-oauth2
+composer require blackcube/oauth2
 ```
-
-## Requirements
-
-- PHP >= 8.3
 
 ## Based On
 
@@ -32,61 +27,37 @@ This package is a toolbox, not a turnkey solution. It provides interfaces and to
 - Multi-population support (admin ≠ customer in the same app)
 - DRY: scopes can be derived from an existing system (RBAC, config, API...)
 
-## Configuration
+## Configuration (Yii3 example)
 
 ### params.php
 
 ```php
 return [
-    'blackcube/yii-oauth2' => [
+    'blackcube/oauth2' => [
+        'name' => 'admin',
+        'issuer' => 'myapp-admin',
+        'audience' => 'myapi',
+        'userQueryClass' => \App\Oauth2\AdminUser::class,
+        'clientQueryClass' => \App\Oauth2\AdminClient::class,
+        'refreshTokenQueryClass' => \App\Oauth2\AdminRefreshToken::class,
+        'cypherKeyQueryClass' => \App\Oauth2\AdminCypherKey::class,
         'algorithm' => 'RS256',
         'accessTokenTtl' => 3600,        // 1h
         'refreshTokenTtl' => 2592000,    // 30 days
+        'allowedGrants' => ['password', 'refresh_token'],
+    ],
+];
+```
 
-        'populations' => [
-            'admin' => [
-                'algorithm' => 'RS512',      // Override base
-                'accessTokenTtl' => 7200,    // 2h for admin
-                'issuer' => 'myapp-admin',
-                'audience' => 'myapi',
+### di.php
 
-                // Entity classes (your app provides these)
-                'userClass' => \App\Oauth2\Admin\AdminUser::class,
-                'clientClass' => \App\Oauth2\Admin\AdminClient::class,
-                'refreshTokenClass' => \App\Oauth2\Admin\AdminRefreshToken::class,
-                'scopeProvider' => \App\Oauth2\Admin\RbacScopeProvider::class,
-                'cypherKeyClass' => \App\Oauth2\Admin\AdminCypherKey::class,
+```php
+use Blackcube\Oauth2\PopulationConfig;
 
-                // Routes
-                'routes' => [
-                    'token' => [
-                        'pattern' => '/oauth2/admin/token',
-                        'methods' => ['POST'],
-                    ],
-                    'revoke' => [
-                        'pattern' => '/oauth2/admin/revoke',
-                        'methods' => ['POST'],
-                    ],
-                ],
-            ],
-
-            'customer' => [
-                'issuer' => 'myapp-customer',
-                'audience' => 'shop',
-                'userClass' => \App\Oauth2\Customer\CustomerUser::class,
-                'clientClass' => \App\Oauth2\Customer\CustomerClient::class,
-                'refreshTokenClass' => \App\Oauth2\Customer\CustomerRefreshToken::class,
-                'scopeProvider' => \App\Oauth2\Customer\CustomerScopeProvider::class,
-                'cypherKeyClass' => \App\Oauth2\Customer\CustomerCypherKey::class,
-                'routes' => [
-                    'token' => [
-                        'pattern' => '/oauth2/token',
-                        'methods' => ['POST'],
-                    ],
-                ],
-                'allowedGrants' => ['password', 'refresh_token'],
-            ],
-        ],
+return [
+    PopulationConfig::class => [
+        'class' => PopulationConfig::class,
+        '__construct()' => $params['blackcube/oauth2'],
     ],
 ];
 ```

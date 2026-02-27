@@ -13,16 +13,20 @@ declare(strict_types=1);
  */
 
 return [
-    'blackcube/yii-oauth2' => [
+    'blackcube/oauth2' => [
+        'name' => 'default',
+        'issuer' => '',
+        'audience' => '',
+        'userQueryClass' => '',
+        'clientQueryClass' => '',
+        'refreshTokenQueryClass' => '',
+        'cypherKeyQueryClass' => '',
         'algorithm' => 'RS256',
         'accessTokenTtl' => 3600,
         'refreshTokenTtl' => 2592000,
         'allowedGrants' => [
             'password',
-            'client_credentials',
-            'authorization_code',
             'refresh_token',
         ],
-        'populations' => [],
     ],
 ];

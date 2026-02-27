@@ -30,16 +30,16 @@ final class Oauth2ServerFactory
         array $customGrants = []
     ): Server {
         $server = new Server($storage, [
-            'access_lifetime' => $config->getAccessTokenTtl(),
-            'refresh_token_lifetime' => $config->getRefreshTokenTtl(),
+            'access_lifetime' => $config->accessTokenTtl,
+            'refresh_token_lifetime' => $config->refreshTokenTtl,
             'use_jwt_access_tokens' => true,
-            'issuer' => $config->getIssuer(),
+            'issuer' => $config->issuer,
             'allow_implicit' => false,
             'enforce_state' => true,
             'always_issue_new_refresh_token' => true,
         ]);
 
-        $allowedGrants = $config->getAllowedGrants();
+        $allowedGrants = $config->allowedGrants;
 
         if (in_array('password', $allowedGrants, true)) {
             $server->addGrantType(new UserCredentials($storage));

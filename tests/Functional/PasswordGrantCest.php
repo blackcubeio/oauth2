@@ -78,24 +78,25 @@ final class PasswordGrantCest
 
     public function testLoginWithValidCredentialsReturnsTokens(FunctionalTester $I): void
     {
-        $storage = new Oauth2Storage(
-            userClass: TestUser::class,
-            clientClass: TestClient::class,
-            refreshTokenClass: TestRefreshToken::class,
-            scopeProvider: new TestScopeProvider(),
-            cypherKeyClass: TestCypherKey::class
-        );
-
         $config = new PopulationConfig(
             name: 'test',
-            config: [
-                'issuer' => 'test-issuer',
-                'audience' => 'test-audience',
-                'accessTokenTtl' => 3600,
-                'refreshTokenTtl' => 86400,
-                'allowedGrants' => ['password', 'refresh_token'],
-            ],
-            baseConfig: []
+            issuer: 'test-issuer',
+            audience: 'test-audience',
+            userQueryClass: TestUser::class,
+            clientQueryClass: TestClient::class,
+            refreshTokenQueryClass: TestRefreshToken::class,
+            cypherKeyQueryClass: TestCypherKey::class,
+            accessTokenTtl: 3600,
+            refreshTokenTtl: 86400,
+            allowedGrants: ['password', 'refresh_token'],
+        );
+
+        $storage = new Oauth2Storage(
+            userClass: $config->userQueryClass,
+            clientClass: $config->clientQueryClass,
+            refreshTokenClass: $config->refreshTokenQueryClass,
+            scopeProvider: new TestScopeProvider(),
+            cypherKeyClass: $config->cypherKeyQueryClass,
         );
 
         $server = Oauth2ServerFactory::create($storage, $config);
@@ -128,23 +129,24 @@ final class PasswordGrantCest
 
     public function testLoginWithBadPasswordReturns401(FunctionalTester $I): void
     {
-        $storage = new Oauth2Storage(
-            userClass: TestUser::class,
-            clientClass: TestClient::class,
-            refreshTokenClass: TestRefreshToken::class,
-            scopeProvider: new TestScopeProvider(),
-            cypherKeyClass: TestCypherKey::class
-        );
-
         $config = new PopulationConfig(
             name: 'test',
-            config: [
-                'issuer' => 'test-issuer',
-                'audience' => 'test-audience',
-                'accessTokenTtl' => 3600,
-                'allowedGrants' => ['password'],
-            ],
-            baseConfig: []
+            issuer: 'test-issuer',
+            audience: 'test-audience',
+            userQueryClass: TestUser::class,
+            clientQueryClass: TestClient::class,
+            refreshTokenQueryClass: TestRefreshToken::class,
+            cypherKeyQueryClass: TestCypherKey::class,
+            accessTokenTtl: 3600,
+            allowedGrants: ['password'],
+        );
+
+        $storage = new Oauth2Storage(
+            userClass: $config->userQueryClass,
+            clientClass: $config->clientQueryClass,
+            refreshTokenClass: $config->refreshTokenQueryClass,
+            scopeProvider: new TestScopeProvider(),
+            cypherKeyClass: $config->cypherKeyQueryClass,
         );
 
         $server = Oauth2ServerFactory::create($storage, $config);
@@ -172,23 +174,24 @@ final class PasswordGrantCest
 
     public function testLoginWithUnknownUserReturns401(FunctionalTester $I): void
     {
-        $storage = new Oauth2Storage(
-            userClass: TestUser::class,
-            clientClass: TestClient::class,
-            refreshTokenClass: TestRefreshToken::class,
-            scopeProvider: new TestScopeProvider(),
-            cypherKeyClass: TestCypherKey::class
-        );
-
         $config = new PopulationConfig(
             name: 'test',
-            config: [
-                'issuer' => 'test-issuer',
-                'audience' => 'test-audience',
-                'accessTokenTtl' => 3600,
-                'allowedGrants' => ['password'],
-            ],
-            baseConfig: []
+            issuer: 'test-issuer',
+            audience: 'test-audience',
+            userQueryClass: TestUser::class,
+            clientQueryClass: TestClient::class,
+            refreshTokenQueryClass: TestRefreshToken::class,
+            cypherKeyQueryClass: TestCypherKey::class,
+            accessTokenTtl: 3600,
+            allowedGrants: ['password'],
+        );
+
+        $storage = new Oauth2Storage(
+            userClass: $config->userQueryClass,
+            clientClass: $config->clientQueryClass,
+            refreshTokenClass: $config->refreshTokenQueryClass,
+            scopeProvider: new TestScopeProvider(),
+            cypherKeyClass: $config->cypherKeyQueryClass,
         );
 
         $server = Oauth2ServerFactory::create($storage, $config);
