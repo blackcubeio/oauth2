@@ -1,4 +1,4 @@
-<?php  //[STAMP] bfe0aaa4b246ef7de07cc4836883a275
+<?php  //[STAMP] 44ab324e84ae42295e18f080a5701913
 // phpcs:ignoreFile
 namespace Blackcube\Oauth2\Tests\Support\_generated;
 

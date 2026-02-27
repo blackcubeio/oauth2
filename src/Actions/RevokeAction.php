@@ -14,25 +14,23 @@ declare(strict_types=1);
 
 namespace Blackcube\Oauth2\Actions;
 
-use Blackcube\Oauth2\Interfaces\RefreshTokenInterface;
+use Blackcube\Oauth2\PopulationConfig;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-final class RevokeAction
+final class RevokeAction implements RequestHandlerInterface
 {
-    /**
-     * @param class-string<RefreshTokenInterface> $refreshTokenClass
-     */
     public function __construct(
-        private string $refreshTokenClass,
+        private PopulationConfig $populationConfig,
         private ResponseFactoryInterface $responseFactory,
-        private StreamFactoryInterface $streamFactory
+        private StreamFactoryInterface $streamFactory,
     ) {
     }
 
-    public function process(ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $parsedBody = $request->getParsedBody();
         $params = is_array($parsedBody) ? $parsedBody : [];
@@ -49,7 +47,8 @@ final class RevokeAction
             return $this->errorResponse(400, 'unsupported_token_type', 'Only refresh_token revocation is supported');
         }
 
-        $refreshToken = $this->refreshTokenClass::queryByToken($token);
+        $refreshTokenClass = $this->populationConfig->refreshTokenQueryClass;
+        $refreshToken = $refreshTokenClass::queryByToken($token);
 
         if ($refreshToken === null) {
             // RFC 7009: Return 200 even if token doesn't exist
