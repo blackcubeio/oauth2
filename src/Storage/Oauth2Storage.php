@@ -222,9 +222,14 @@ class Oauth2Storage implements
         $user = $this->userClass::queryByIdentifier($username);
 
         if ($user !== null) {
+            $restrictedScopes = $user->getRestrictedScopes();
+            $scope = null;
+            if ($restrictedScopes !== null) {
+                $scope = implode(' ', $restrictedScopes);
+            }
             $details = [
                 'user_id' => $user->getId(),
-                'scope' => null,
+                'scope' => $scope,
             ];
         }
 

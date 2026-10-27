@@ -18,6 +18,7 @@ use Blackcube\Oauth2\Tests\Support\FunctionalTester;
 use Blackcube\Oauth2\Tests\Support\TestClient;
 use Blackcube\Oauth2\Tests\Support\TestCypherKey;
 use Blackcube\Oauth2\Tests\Support\TestRefreshToken;
+use Blackcube\Oauth2\Tests\Support\TestRestrictedUser;
 use Blackcube\Oauth2\Tests\Support\TestScopeProvider;
 use Blackcube\Oauth2\Tests\Support\TestUser;
 use OAuth2\Request as Oauth2Request;
@@ -211,5 +212,106 @@ class PasswordGrantCest
         $server->handleTokenRequest($request, $response);
 
         $I->assertEquals(401, $response->getStatusCode());
+    }
+
+    public function testRestrictedUserAskingScopeOutsideRestrictionReturns400(FunctionalTester $I): void
+    {
+        $this->ensureTestData();
+
+        $config = new PopulationConfig(
+            name: 'test',
+            issuer: 'test-issuer',
+            audience: 'test-audience',
+            userQueryClass: TestRestrictedUser::class,
+            clientQueryClass: TestClient::class,
+            refreshTokenQueryClass: TestRefreshToken::class,
+            cypherKeyQueryClass: TestCypherKey::class,
+            accessTokenTtl: 3600,
+            allowedGrants: ['password'],
+        );
+
+        $storage = new Oauth2Storage(
+            userClass: $config->userQueryClass,
+            clientClass: $config->clientQueryClass,
+            refreshTokenClass: $config->refreshTokenQueryClass,
+            scopeProvider: new TestScopeProvider(),
+            cypherKeyClass: $config->cypherKeyQueryClass,
+        );
+
+        $server = Oauth2ServerFactory::create($storage, $config);
+
+        $request = new Oauth2Request(
+            query: [],
+            request: [
+                'grant_type' => 'password',
+                'username' => 'admin@example.com',
+                'password' => 'secret123',
+                'client_id' => 'test-app',
+                'client_secret' => 'client-secret',
+                'scope' => 'admin',
+            ],
+            attributes: [],
+            cookies: [],
+            files: [],
+            server: ['REQUEST_METHOD' => 'POST']
+        );
+
+        $response = new Oauth2Response();
+        $server->handleTokenRequest($request, $response);
+
+        $I->assertEquals(400, $response->getStatusCode(), 'Response body: ' . $response->getResponseBody());
+        $body = json_decode($response->getResponseBody(), true);
+        $I->assertEquals('invalid_scope', $body['error']);
+    }
+
+    public function testRestrictedUserAskingScopeInsideRestrictionReturnsTokens(FunctionalTester $I): void
+    {
+        $this->ensureTestData();
+
+        $config = new PopulationConfig(
+            name: 'test',
+            issuer: 'test-issuer',
+            audience: 'test-audience',
+            userQueryClass: TestRestrictedUser::class,
+            clientQueryClass: TestClient::class,
+            refreshTokenQueryClass: TestRefreshToken::class,
+            cypherKeyQueryClass: TestCypherKey::class,
+            accessTokenTtl: 3600,
+            allowedGrants: ['password'],
+        );
+
+        $storage = new Oauth2Storage(
+            userClass: $config->userQueryClass,
+            clientClass: $config->clientQueryClass,
+            refreshTokenClass: $config->refreshTokenQueryClass,
+            scopeProvider: new TestScopeProvider(),
+            cypherKeyClass: $config->cypherKeyQueryClass,
+        );
+
+        $server = Oauth2ServerFactory::create($storage, $config);
+
+        $request = new Oauth2Request(
+            query: [],
+            request: [
+                'grant_type' => 'password',
+                'username' => 'admin@example.com',
+                'password' => 'secret123',
+                'client_id' => 'test-app',
+                'client_secret' => 'client-secret',
+                'scope' => 'read',
+            ],
+            attributes: [],
+            cookies: [],
+            files: [],
+            server: ['REQUEST_METHOD' => 'POST']
+        );
+
+        $response = new Oauth2Response();
+        $server->handleTokenRequest($request, $response);
+
+        $I->assertEquals(200, $response->getStatusCode(), 'Response body: ' . $response->getResponseBody());
+        $body = json_decode($response->getResponseBody(), true);
+        $I->assertArrayHasKey('access_token', $body);
+        $I->assertEquals('read', $body['scope']);
     }
 }
